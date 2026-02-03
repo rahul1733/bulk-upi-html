@@ -1,60 +1,107 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <meta charset="UTF-8" />
+  <meta charset="UTF-8">
   <title>Bulk UPI QR Generator</title>
+
   <style>
-    body { font-family: Arial; padding: 20px; max-width: 900px; margin: auto; }
-    textarea, button { width: 100%; padding: 10px; margin-top: 10px; }
-    .grid { display: grid; grid-template-columns: repeat(auto-fill, 200px); gap: 20px; margin-top: 20px; }
-    .card { border: 1px solid #ccc; padding: 10px; text-align: center; }
-    img { width: 180px; }
+    body {
+      font-family: Arial, sans-serif;
+      padding: 16px;
+      max-width: 900px;
+      margin: auto;
+    }
+    textarea, button {
+      width: 100%;
+      padding: 10px;
+      margin-top: 10px;
+      font-size: 14px;
+    }
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+      gap: 16px;
+      margin-top: 20px;
+    }
+    .card {
+      border: 1px solid #ccc;
+      padding: 10px;
+      text-align: center;
+    }
+    img {
+      width: 160px;
+      height: 160px;
+    }
   </style>
 </head>
+
 <body>
 
 <h2>Bulk UPI QR Generator</h2>
 
-<textarea id="input" rows="6" placeholder="rahul@ybl&#10;shop@okaxis"></textarea>
-<button onclick="generate()">Generate QR</button>
+<p>Har line me ek VPA likho</p>
+
+<!-- ✅ PREFILLED DATA -->
+<textarea id="input" rows="6">
+rahul@rhj
+shop@ybl
+test@okaxis
+</textarea>
+
+<button onclick="generateQR()">Generate QR</button>
 
 <div id="output" class="grid"></div>
 
-<script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.4/build/qrcode.min.js"></script>
+<!-- ✅ Correct CDN (important) -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcode/1.5.4/qrcode.min.js"></script>
 
 <script>
-function generate() {
-  const lines = document.getElementById('input').value
-    .split('\n')
-    .map(v => v.trim())
-    .filter(Boolean);
+function generateQR() {
+  const input = document.getElementById('input').value;
+  const vpas = input.split('\n').map(v => v.trim()).filter(Boolean);
+  const output = document.getElementById('output');
 
-  const out = document.getElementById('output');
-  out.innerHTML = '';
+  output.innerHTML = '';
 
-  lines.forEach(vpa => {
-    const div = document.createElement('div');
-    div.className = 'card';
+  if (vpas.length === 0) {
+    alert('VPA dalo');
+    return;
+  }
+
+  vpas.forEach(vpa => {
+    const card = document.createElement('div');
+    card.className = 'card';
 
     const img = document.createElement('img');
-    QRCode.toDataURL('upi://pay?pa=' + vpa, { width: 300 }, (err, url) => {
-      img.src = url;
-    });
+
+    QRCode.toDataURL(
+      'upi://pay?pa=' + encodeURIComponent(vpa),
+      { width: 300, margin: 1 },
+      function (err, url) {
+        if (err) {
+          alert('QR error for ' + vpa);
+          return;
+        }
+        img.src = url;
+      }
+    );
 
     const label = document.createElement('div');
     label.innerText = vpa;
 
-    const a = document.createElement('a');
-    a.innerText = 'Download';
-    a.onclick = () => {
-      a.href = img.src;
-      a.download = vpa.replace(/[^a-z0-9]/gi, '_') + '.png';
+    const download = document.createElement('a');
+    download.innerText = 'Download';
+    download.style.display = 'block';
+    download.style.marginTop = '6px';
+    download.onclick = () => {
+      download.href = img.src;
+      download.download = vpa.replace(/[^a-z0-9]/gi, '_') + '.png';
     };
 
-    div.appendChild(img);
-    div.appendChild(label);
-    div.appendChild(a);
-    out.appendChild(div);
+    card.appendChild(img);
+    card.appendChild(label);
+    card.appendChild(download);
+    output.appendChild(card);
   });
 }
 </script>
