@@ -3,9 +3,11 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
 <title>Offline Bulk UPI QR Generator</title>
 
 <style>
+
 body{
   font-family: Arial, sans-serif;
   padding:20px;
@@ -44,14 +46,15 @@ button{
   border-radius:6px;
 }
 
-/* ✅ QR Border */
+/* QR Border + Quiet Zone */
 .qr-box{
   background:white;
-  padding:10px;        /* Quiet Zone */
+  padding:12px;
   border:2px solid #000;
   display:inline-block;
   margin:5px 0;
 }
+
 </style>
 </head>
 
@@ -59,7 +62,9 @@ button{
 
 <h2>Offline Bulk UPI QR Generator</h2>
 
-<p style="text-align:center">Har line me ek UPI ID likho</p>
+<p style="text-align:center">
+Har line me ek UPI ID likho
+</p>
 
 <textarea id="vpaList" rows="8" placeholder="example@upi"></textarea>
 
@@ -68,18 +73,24 @@ button{
 <div id="output" class="grid"></div>
 
 
-<!-- QR Library -->
+<!-- QR Library (Online CDN) -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+
 
 <script>
 
 function generateAll(){
 
-  const list = document.getElementById("vpaList").value.split(/\n+/);
+  const list =
+    document.getElementById("vpaList")
+    .value
+    .split(/\n+/);
 
-  const out = document.getElementById("output");
+  const out =
+    document.getElementById("output");
 
   out.innerHTML = "";
+
 
   list.forEach(vpa => {
 
@@ -87,82 +98,121 @@ function generateAll(){
 
     if(!vpa) return;
 
-    const card = document.createElement("div");
+
+    /* Card */
+    const card =
+      document.createElement("div");
+
     card.className = "card";
 
 
-    const label = document.createElement("div");
+    /* Label */
+    const label =
+      document.createElement("div");
+
     label.textContent = vpa;
 
 
-    /* ✅ QR Wrapper with Border */
-    const qrWrapper = document.createElement("div");
+    /* QR Wrapper */
+    const qrWrapper =
+      document.createElement("div");
+
     qrWrapper.className = "qr-box";
 
 
-    const qrBox = document.createElement("div");
+    const qrBox =
+      document.createElement("div");
 
 
+    /* ✅ FIXED UPI LINK (NO %40) */
     const upiLink =
-      "upi://pay?pa=" + encodeURIComponent(vpa) +
+      "upi://pay?pa=" + vpa +
       "&pn=Payment&cu=INR";
 
 
+    /* Generate QR */
     new QRCode(qrBox,{
+
       text: upiLink,
+
       width:160,
       height:160,
+
       colorDark:"#000000",
       colorLight:"#ffffff",
-      correctLevel:QRCode.CorrectLevel.H
+
+      correctLevel: QRCode.CorrectLevel.H
+
     });
 
 
     qrWrapper.appendChild(qrBox);
 
 
-    const btn = document.createElement("button");
+    /* Download Button */
+    const btn =
+      document.createElement("button");
+
     btn.textContent = "Download";
 
 
     btn.onclick = ()=>{
 
-      const canvas = qrBox.querySelector("canvas");
+      const canvas =
+        qrBox.querySelector("canvas");
 
-      /* Create new canvas with border */
-      const newCanvas = document.createElement("canvas");
 
-      const size = canvas.width + 40;
+      /* Create New Canvas with Border */
+      const newCanvas =
+        document.createElement("canvas");
+
+
+      const size =
+        canvas.width + 40;
+
 
       newCanvas.width = size;
       newCanvas.height = size;
 
-      const ctx = newCanvas.getContext("2d");
 
-      /* White background */
+      const ctx =
+        newCanvas.getContext("2d");
+
+
+      /* White Background */
       ctx.fillStyle = "#ffffff";
       ctx.fillRect(0,0,size,size);
 
-      /* Black border */
+
+      /* Black Border */
       ctx.strokeStyle = "#000000";
       ctx.lineWidth = 4;
       ctx.strokeRect(2,2,size-4,size-4);
+
 
       /* Draw QR */
       ctx.drawImage(canvas,20,20);
 
 
-      const a = document.createElement("a");
+      /* Download */
+      const a =
+        document.createElement("a");
+
 
       a.download =
-        vpa.replace(/[^a-z0-9]/gi,"_") + ".png";
+        vpa.replace(/[^a-z0-9]/gi,"_") +
+        ".png";
 
-      a.href = newCanvas.toDataURL("image/png");
+
+      a.href =
+        newCanvas.toDataURL("image/png");
 
       a.click();
+
     };
 
 
+    /* Append */
     card.appendChild(label);
     card.appendChild(qrWrapper);
     card.appendChild(btn);
@@ -170,6 +220,7 @@ function generateAll(){
     out.appendChild(card);
 
   });
+
 }
 
 </script>
