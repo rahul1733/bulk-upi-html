@@ -6,46 +6,51 @@
 <title>Offline Bulk UPI QR Generator</title>
 
 <style>
-body {
+body{
   font-family: Arial, sans-serif;
-  padding: 20px;
-  background: #f5f5f5;
+  padding:20px;
+  background:#f2f2f2;
 }
 
-h2 {
-  text-align: center;
+h2{
+  text-align:center;
 }
 
-textarea, button {
-  width: 100%;
-  max-width: 600px;
-  margin: 10px auto;
-  display: block;
-  padding: 10px;
-  font-size: 15px;
+textarea,button{
+  width:100%;
+  max-width:600px;
+  margin:10px auto;
+  display:block;
+  padding:10px;
+  font-size:15px;
 }
 
-button {
-  cursor: pointer;
+button{
+  cursor:pointer;
 }
 
-.grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
-  gap: 15px;
-  margin-top: 20px;
+.grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fill,minmax(180px,1fr));
+  gap:15px;
+  margin-top:20px;
 }
 
-.card {
-  background: white;
-  border: 1px solid #ccc;
-  padding: 10px;
-  text-align: center;
-  border-radius: 6px;
+.card{
+  background:#fff;
+  border:1px solid #ccc;
+  padding:10px;
+  text-align:center;
+  border-radius:6px;
 }
 
-canvas {
-  margin: 5px 0;
+/* ✅ QR Border */
+.qr-box{
+  background:white;
+  padding:10px;        /* Quiet Zone */
+  border:2px solid #000;
+  display:inline-block;
+  margin:5px 0;
 }
 </style>
 </head>
@@ -53,6 +58,7 @@ canvas {
 <body>
 
 <h2>Offline Bulk UPI QR Generator</h2>
+
 <p style="text-align:center">Har line me ek UPI ID likho</p>
 
 <textarea id="vpaList" rows="8" placeholder="example@upi"></textarea>
@@ -61,7 +67,112 @@ canvas {
 
 <div id="output" class="grid"></div>
 
-<!-- REAL QR LIBRARY (Embedded) -->
+
+<!-- QR Library -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+
 <script>
-/*!
-QRCode.js v1
+
+function generateAll(){
+
+  const list = document.getElementById("vpaList").value.split(/\n+/);
+
+  const out = document.getElementById("output");
+
+  out.innerHTML = "";
+
+  list.forEach(vpa => {
+
+    vpa = vpa.trim();
+
+    if(!vpa) return;
+
+    const card = document.createElement("div");
+    card.className = "card";
+
+
+    const label = document.createElement("div");
+    label.textContent = vpa;
+
+
+    /* ✅ QR Wrapper with Border */
+    const qrWrapper = document.createElement("div");
+    qrWrapper.className = "qr-box";
+
+
+    const qrBox = document.createElement("div");
+
+
+    const upiLink =
+      "upi://pay?pa=" + encodeURIComponent(vpa) +
+      "&pn=Payment&cu=INR";
+
+
+    new QRCode(qrBox,{
+      text: upiLink,
+      width:160,
+      height:160,
+      colorDark:"#000000",
+      colorLight:"#ffffff",
+      correctLevel:QRCode.CorrectLevel.H
+    });
+
+
+    qrWrapper.appendChild(qrBox);
+
+
+    const btn = document.createElement("button");
+    btn.textContent = "Download";
+
+
+    btn.onclick = ()=>{
+
+      const canvas = qrBox.querySelector("canvas");
+
+      /* Create new canvas with border */
+      const newCanvas = document.createElement("canvas");
+
+      const size = canvas.width + 40;
+
+      newCanvas.width = size;
+      newCanvas.height = size;
+
+      const ctx = newCanvas.getContext("2d");
+
+      /* White background */
+      ctx.fillStyle = "#ffffff";
+      ctx.fillRect(0,0,size,size);
+
+      /* Black border */
+      ctx.strokeStyle = "#000000";
+      ctx.lineWidth = 4;
+      ctx.strokeRect(2,2,size-4,size-4);
+
+      /* Draw QR */
+      ctx.drawImage(canvas,20,20);
+
+
+      const a = document.createElement("a");
+
+      a.download =
+        vpa.replace(/[^a-z0-9]/gi,"_") + ".png";
+
+      a.href = newCanvas.toDataURL("image/png");
+
+      a.click();
+    };
+
+
+    card.appendChild(label);
+    card.appendChild(qrWrapper);
+    card.appendChild(btn);
+
+    out.appendChild(card);
+
+  });
+}
+
+</script>
+
+</body>
+</html>
