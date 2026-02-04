@@ -1,121 +1,67 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Offline Bulk UPI QR Generator</title>
-  <style>
-    body { font-family: Arial, sans-serif; padding: 20px; }
-    h2 { text-align: center; }
-    textarea, button {
-      width: 100%;
-      max-width: 600px;
-      margin: 8px auto;
-      display: block;
-      padding: 10px;
-    }
-    .grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
-      gap: 15px;
-      margin-top: 20px;
-    }
-    .card {
-      text-align: center;
-      border: 1px solid #ccc;
-      padding: 10px;
-    }
-    canvas {
-      width: 160px;
-      height: 160px;
-    }
-  </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Offline Bulk UPI QR Generator</title>
+
+<style>
+body {
+  font-family: Arial, sans-serif;
+  padding: 20px;
+  background: #f5f5f5;
+}
+
+h2 {
+  text-align: center;
+}
+
+textarea, button {
+  width: 100%;
+  max-width: 600px;
+  margin: 10px auto;
+  display: block;
+  padding: 10px;
+  font-size: 15px;
+}
+
+button {
+  cursor: pointer;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  gap: 15px;
+  margin-top: 20px;
+}
+
+.card {
+  background: white;
+  border: 1px solid #ccc;
+  padding: 10px;
+  text-align: center;
+  border-radius: 6px;
+}
+
+canvas {
+  margin: 5px 0;
+}
+</style>
 </head>
 
 <body>
 
 <h2>Offline Bulk UPI QR Generator</h2>
-<p style="text-align:center">Har line me ek VPA likho</p>
+<p style="text-align:center">Har line me ek UPI ID likho</p>
 
-<!-- ✅ BLANK TEXTAREA (no prefilled data) -->
-<textarea id="vpaList" rows="8" placeholder="Har line me ek VPA likho"></textarea>
+<textarea id="vpaList" rows="8" placeholder="example@upi"></textarea>
 
-<button onclick="generateAll()">Generate All QR</button>
+<button onclick="generateAll()">Generate QR</button>
 
 <div id="output" class="grid"></div>
 
+<!-- REAL QR LIBRARY (Embedded) -->
 <script>
-/* Minimal working QR generator (offline) */
-(function(){
-  function a(a){this.data=a}
-  function b(a,b){
-    this.modules=[];
-    this.count=21;
-    for(let i=0;i<this.count;i++){
-      this.modules[i]=[];
-      for(let j=0;j<this.count;j++){
-        this.modules[i][j]=Math.random()>0.5;
-      }
-    }
-  }
-  function QR(el){this.el=el}
-  QR.prototype.makeCode=function(text){
-    this.el.innerHTML="";
-    let c=document.createElement("canvas"),
-        ctx=c.getContext("2d"),
-        s=210;
-    c.width=s;
-    c.height=s;
-    let m=21,
-        cs=s/m;
-    for(let i=0;i<m;i++)
-      for(let j=0;j<m;j++){
-        ctx.fillStyle=Math.random()>0.5?"#000":"#fff";
-        ctx.fillRect(j*cs,i*cs,cs,cs);
-      }
-    this.el.appendChild(c);
-  };
-  window.QRCode=QR;
-})();
-</script>
-
-<script>
-function generateAll(){
-  const list=document.getElementById('vpaList').value.split(/\n+/);
-  const out=document.getElementById('output');
-  out.innerHTML='';
-
-  list.forEach(vpa=>{
-    vpa=vpa.trim();
-    if(!vpa) return;
-
-    const card=document.createElement('div');
-    card.className='card';
-
-    const label=document.createElement('div');
-    label.textContent=vpa;
-
-    const qrBox=document.createElement('div');
-    const qr=new QRCode(qrBox);
-    qr.makeCode('upi://pay?pa='+encodeURIComponent(vpa));
-
-    const btn=document.createElement('button');
-    btn.textContent='Download';
-    btn.onclick=()=>{
-      const canvas=qrBox.querySelector('canvas');
-      const a=document.createElement('a');
-      a.download=vpa.replace(/[^a-z0-9]/gi,'_')+'.png';
-      a.href=canvas.toDataURL();
-      a.click();
-    };
-
-    card.appendChild(label);
-    card.appendChild(qrBox);
-    card.appendChild(btn);
-    out.appendChild(card);
-  });
-}
-</script>
-
-</body>
-</html>
+/*!
+QRCode.js v1
