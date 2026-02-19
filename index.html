@@ -1,1 +1,180 @@
-Closed 
+
+<!DOCTYPE html>
+<html>
+<head>
+<title>UPI QR Generator</title>
+
+<style>
+body{
+    font-family: Arial;
+    background:#f0f0f0;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    height:100vh;
+    margin:0;
+}
+
+.container{
+    background:#fff;
+    padding:20px;
+    width:350px;
+    border-radius:8px;
+    text-align:center;
+    box-shadow:0 0 10px rgba(0,0,0,.1);
+}
+
+h3{
+    margin-top:0;
+}
+
+.input-group{
+    text-align:left;
+    margin-bottom:15px;
+}
+
+label{
+    font-weight:bold;
+}
+
+input{
+    width:100%;
+    padding:10px;
+    margin-top:5px;
+    border:1px solid #ccc;
+    border-radius:4px;
+    box-sizing:border-box;
+}
+
+.vpa-group{
+    display:flex;
+    align-items:center;
+    gap:5px;
+}
+
+.vpa-group input:first-child{
+    flex:1;
+}
+
+.handle{
+    width:70px;
+    background:#eee;
+    text-align:center;
+}
+
+button{
+    width:100%;
+    padding:10px;
+    background:#007bff;
+    color:white;
+    border:none;
+    border-radius:4px;
+    cursor:pointer;
+    margin-top:10px;
+}
+
+button:hover{
+    background:#0056b3;
+}
+
+#qr-box{
+    margin-top:20px;
+    padding:10px;
+    border:3px solid black;
+    display:inline-block;
+    position:relative;
+    background:white;
+    border-radius:8px;
+}
+
+#logo{
+    width:40px;
+    position:absolute;
+    top:50%;
+    left:50%;
+    transform:translate(-50%,-50%);
+    background:white;
+    padding:3px;
+    border-radius:6px;
+}
+
+#result{
+    text-align:center;
+}
+</style>
+</head>
+
+<body>
+
+<div class="container">
+
+<h3>UPI QR Generator</h3>
+
+<div class="input-group">
+<label>Name</label>
+<input id="name" placeholder="Enter Name">
+</div>
+
+<div class="input-group">
+<label>VPA</label>
+
+<div class="vpa-group">
+<input id="vpa" value="Q" placeholder="Enter ID">
+<span>@</span>
+<input value="ybl" readonly class="handle">
+</div>
+
+</div>
+
+<button onclick="makeQR()">Generate QR</button>
+
+<div id="result"></div>
+
+</div>
+
+
+<!-- Local QR Library (Put qrcode.min.js in same folder) -->
+<script src="qrcode.min.js"></script>
+
+<script>
+function makeQR(){
+
+    let name = document.getElementById("name").value.trim();
+    let vpaPart = document.getElementById("vpa").value.trim();
+
+    if(!vpaPart){
+        alert("Please enter VPA");
+        return;
+    }
+
+    // Auto ensure Q at start
+    if(!vpaPart.startsWith("Q")){
+        vpaPart = "Q" + vpaPart;
+    }
+
+    let fullVPA = vpaPart + "@ybl";
+
+    let upi =
+    `upi://pay?pa=${fullVPA}&pn=${encodeURIComponent(name)}`;
+
+    let box = document.getElementById("result");
+
+    box.innerHTML = `
+      <div id="qr-box">
+        <div id="qrcode"></div>
+        <img id="logo" src="phonepe.png">
+      </div>
+    `;
+
+    new QRCode(document.getElementById("qrcode"),{
+        text: upi,
+        width:180,
+        height:180,
+        colorDark:"#000000",
+        colorLight:"#ffffff"
+    });
+}
+</script>
+
+</body>
+</html>
