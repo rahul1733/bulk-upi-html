@@ -1,49 +1,93 @@
 <!DOCTYPE html>
 <html>
 <head>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>UPI QR Generator</title>
 
 <style>
+*{
+    box-sizing:border-box;
+}
+
 body{
-    font-family: Arial;
-    background:#f0f0f0;
+    font-family: Arial, sans-serif;
+    margin:0;
+    padding:20px;
+    background: linear-gradient(135deg,#5f259f,#a4508b);
     display:flex;
     justify-content:center;
     align-items:center;
-    height:100vh;
-    margin:0;
+    min-height:100vh;
 }
 
 .container{
-    background:#fff;
-    padding:20px;
-    width:350px;
-    border-radius:8px;
+    background:#ffffff;
+    width:100%;
+    max-width:380px;
+    padding:25px 20px;
+    border-radius:12px;
+    box-shadow:0 15px 35px rgba(0,0,0,0.2);
     text-align:center;
-    box-shadow:0 0 10px rgba(0,0,0,.1);
+}
+
+h3{
+    margin-top:0;
+    margin-bottom:20px;
+    color:#5f259f;
 }
 
 input{
     width:100%;
-    padding:10px;
-    margin:8px 0;
+    padding:12px;
+    margin:10px 0;
+    border:1px solid #ccc;
+    border-radius:6px;
+    font-size:16px;
+}
+
+.vpa-group{
+    display:flex;
+    align-items:center;
+    gap:5px;
+}
+
+.vpa-group input:first-child{
+    flex:1;
+}
+
+.vpa-group span{
+    font-weight:bold;
+}
+
+.handle{
+    width:70px;
+    background:#eee;
+    text-align:center;
 }
 
 button{
     width:100%;
-    padding:10px;
-    background:#007bff;
+    padding:12px;
+    background:#5f259f;
     color:white;
     border:none;
+    border-radius:6px;
+    font-size:16px;
     cursor:pointer;
+    margin-top:10px;
+}
+
+button:active{
+    transform:scale(0.98);
 }
 
 #qr-box{
     margin-top:20px;
-    padding:10px;
-    border:3px solid black;
+    padding:15px;
+    border:3px solid #5f259f;
     display:inline-block;
-    position:relative;
+    background:white;
+    border-radius:10px;
 }
 </style>
 </head>
@@ -52,25 +96,22 @@ button{
 
 <div class="container">
 
-<h3>UPI QR</h3>
+<h3>UPI QR Generator</h3>
 
-<input id="name" placeholder="Name">
+<input id="name" placeholder="Enter Name">
 
-<!-- VPA with default Q and fixed @ybl -->
-<div style="display:flex;align-items:center;gap:5px;">
-    <input id="vpa" value="Q" placeholder="Enter ID" style="flex:1;">
+<div class="vpa-group">
+    <input id="vpa" value="Q" placeholder="Enter ID">
     <span>@</span>
-    <input value="ybl" readonly style="width:70px;background:#eee;text-align:center;">
+    <input value="ybl" readonly class="handle">
 </div>
 
-<button onclick="makeQR()">Generate</button>
+<button onclick="makeQR()">Generate QR</button>
 
 <div id="result"></div>
 
 </div>
 
-
-<!-- LOCAL QR LIBRARY -->
 <script src="qrcode.min.js"></script>
 
 <script>
@@ -84,7 +125,6 @@ function makeQR(){
         return;
     }
 
-    // Ensure Q at start
     if(!vpaPart.startsWith("Q")){
         vpaPart = "Q" + vpaPart;
     }
@@ -104,8 +144,8 @@ function makeQR(){
 
     new QRCode(document.getElementById("qrcode"),{
         text: upi,
-        width:180,
-        height:180
+        width:200,
+        height:200
     });
 }
 </script>
